@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import db from "./db";
 import collegeRoutes from "./routes/college.routes";
 import predictorRoutes from "./routes/predictor.routes";
 
@@ -14,6 +15,7 @@ app.use(cors({
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
