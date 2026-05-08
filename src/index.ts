@@ -11,7 +11,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "https://college-platform-ivory.vercel.app",
+  origin: (origin, callback) => {
+    const allowed = [
+      "https://college-platform-ivory.vercel.app",
+      /^https:\/\/college-platform-.*\.vercel\.app$/,  // allows all preview URLs
+    ];
+    if (!origin || allowed.some(o => typeof o === "string" ? o === origin : o.test(origin))) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 }));
