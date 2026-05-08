@@ -7,57 +7,123 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── College ──────────────────────────────────────────────────────────────────
+
 model College {
-  id               Int      @id @default(autoincrement())
+  id               Int             @id @default(autoincrement())
   name             String
-  slug             String   @unique
+  slug             String          @unique
   location         String
   city             String
   state            String
   fees             Int
-  rating           Float
-  reviewCount      Int      @default(0)
-  placementPercent Float
-  avgPackage       Float
-  highestPackage   Float
+  rating           Float           @default(0)
+  reviewCount      Int             @default(0)
+  placementPercent Float           @default(0)
+  avgPackage       Float           @default(0)
+  highestPackage   Float           @default(0)
   established      Int
   affiliation      String
   description      String
-  type             String
+  type             CollegeType
+
   courses          Course[]
   reviews          Review[]
   predictorRules   PredictorRule[]
-  createdAt        DateTime @default(now())
+
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@index([state, city])
+  @@index([fees, rating])
+  @@index([type, rating])
+
+  @@map("colleges")
 }
 
+enum CollegeType {
+  GOVERNMENT
+  PRIVATE
+  DEEMED
+  AUTONOMOUS
+
+  @@map("college_type")
+}
+
+// ─── Course ───────────────────────────────────────────────────────────────────
+
 model Course {
-  id        Int     @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   collegeId Int
-  college   College @relation(fields: [collegeId], references: [id])
+  college   College        @relation(fields: [collegeId], references: [id], onDelete: Cascade)
   name      String
   duration  String
   fees      Int
   seats     Int
-  category  String
+  category  CourseCategory
+
+  @@index([collegeId])
+  @@index([category, fees])
+
+  @@map("courses")
 }
+
+enum CourseCategory {
+  ENGINEERING
+  MEDICAL
+  MANAGEMENT
+  LAW
+  ARTS
+  SCIENCE
+  COMMERCE
+  DESIGN
+  OTHER
+
+  @@map("course_category")
+}
+
+// ─── Review ───────────────────────────────────────────────────────────────────
 
 model Review {
   id        Int      @id @default(autoincrement())
   collegeId Int
-  college   College  @relation(fields: [collegeId], references: [id])
+  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
   author    String
   rating    Float
   content   String
   batch     String
   createdAt DateTime @default(now())
+
+  @@index([collegeId, createdAt(sort: Desc)])
+
+  @@map("reviews")
 }
 
+// ─── PredictorRule ────────────────────────────────────────────────────────────
+
 model PredictorRule {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   collegeId Int
-  college   College @relation(fields: [collegeId], references: [id])
-  exam      String
+  college   College  @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  exam      ExamType
+  branch    String
   rankMin   Int
   rankMax   Int
-  branch    String
+  year      Int      @default(2023)
+
+  @@unique([collegeId, exam, branch, year])
+  @@index([exam, rankMin, rankMax])
+  @@index([collegeId, exam])
+
+  @@map("predictor_rules")
+}
+
+enum ExamType {
+  JEE_MAIN
+  JEE_ADVANCED
+  NEET
+  CAT
+  GATE
+
+  @@map("exam_type")
 }
