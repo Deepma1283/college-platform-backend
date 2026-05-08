@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors({
   origin: (origin, callback) => {
     const allowed = [
-      "https://college-platform-ivory.vercel.app",
+      "https://college-platform-frontend-pied.vercel.app",
       /^https:\/\/college-platform-.*\.vercel\.app$/,  // allows all preview URLs
     ];
     if (!origin || allowed.some(o => typeof o === "string" ? o === origin : o.test(origin))) {
