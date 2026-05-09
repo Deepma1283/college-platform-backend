@@ -11,21 +11,19 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: (origin, callback) => {
+  origin: function(origin, callback) {
     const allowed = [
-      "https://college-platform-vercel.vercel.app/",
-      /^https:\/\/college-platform-.*\.vercel\.app$/,  // allows all preview URLs
+      /https:\/\/college-platform.*\.vercel\.app$/,
+      /http:\/\/localhost:\d+$/
     ];
-    if (!origin || allowed.some(o => typeof o === "string" ? o === origin : o.test(origin))) {
+    if (!origin || allowed.some(pattern => pattern.test(origin))) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
-
 app.use(express.json());
 
 app.get("/health", (_req, res) => {
