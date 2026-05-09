@@ -26,11 +26,10 @@ export const getColleges = async (req: Request, res: Response) => {
     }
     if (type) where.type = type;
     if (course) {
+  const normalizedCourse = (course as string).toUpperCase();
   where.courses = {
     some: {
-      category: {
-        equals: (course as string).toLowerCase(),
-      },
+      category: normalizedCourse as any,
     },
   };
 }
