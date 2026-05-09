@@ -26,8 +26,14 @@ export const getColleges = async (req: Request, res: Response) => {
     }
     if (type) where.type = type;
     if (course) {
-      where.courses = { some: { category: { equals: course as string, mode: "insensitive" } } };
-    }
+  where.courses = {
+    some: {
+      category: {
+        equals: (course as string).toLowerCase(),
+      },
+    },
+  };
+}
 
     const validSortFields: Record<string, string> = { rating: "rating", fees: "fees", placement: "placementPercent", name: "name" };
     const orderBy: any = {};
